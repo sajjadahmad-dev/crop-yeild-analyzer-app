@@ -1,14 +1,16 @@
-import streamlit==1.41.1 as st
+import streamlit as st
 import numpy as np
 import joblib
 import requests
 
-# Load the model
-model = joblib.load('crop_yield_production_model.pkl')
+# Function to load the model
+def load_model():
+    model = joblib.load('crop_yield_production_model.pkl')
+    return model
 
 # Function to make predictions
-def predict_crop_yield(input_data):
-    # Convert to numpy array and reshape for prediction
+def predict_crop_yield(input_data, model):
+    # Convert input data to numpy array and reshape for prediction
     input_data = np.array(input_data).reshape(1, -1)
     
     # Make prediction
@@ -19,6 +21,9 @@ def predict_crop_yield(input_data):
 def main():
     st.title("Crop Yield Prediction")
     
+    # Load the model once
+    model = load_model()
+
     # Form to input data
     with st.form(key="yield_form"):
         region = st.selectbox("Region", ["North", "West", "South", "East"])
@@ -35,6 +40,7 @@ def main():
     
     # Process the data and make prediction
     if submit_button:
+        # Mappings for categorical variables
         region_map = {"North": 1, "West": 3, "South": 2, "East": 0}
         soil_type_map = {"Sandy": 4, "Loam": 2, "Chalky": 0, "Silt": 5, "Clay": 1, "Peaty": 3}
         crop_map = {"Maize": 2, "Rice": 3, "Barley": 0, "Wheat": 5, "Cotton": 1, "Soybean": 4}
@@ -52,8 +58,10 @@ def main():
             days_to_harvest
         ]
         
-        prediction = predict_crop_yield(data)
+        # Make the prediction
+        prediction = predict_crop_yield(data, model)
         
+        # Display the result
         st.success(f"Predicted Yield: {prediction:.2f} tons per hectare")
 
 if __name__ == '__main__':
