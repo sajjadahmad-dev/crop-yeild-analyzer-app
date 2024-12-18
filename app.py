@@ -1,4 +1,4 @@
-import streamlit as st
+import streamlit==1.41.1 as st
 import numpy as np
 import joblib
 import requests
